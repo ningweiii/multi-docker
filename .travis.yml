@@ -10,7 +10,7 @@ before_install:
 script:
   - docker run -e CI=true wn0858/react-test npm test # npm test never exit, so add -e CI=true
 
-after-success:
+after_success:
   - docker build -t wn0858/multi-client ./client
   - docker build -t wn0858/multi-nginx ./nginx
   - docker build -t wn0858/multi-server ./server
