@@ -1,0 +1,27 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  # build test version of client project
+  - docker build -t wn0858/react-test -f ./client/Dockerfile.dev ./client
+
+# run tests
+script:
+  - docker run -e CI=true wn0858/react-test npm test # npm test never exit, so add -e CI=true
+
+after-success:
+  - docker build -t wn0858/multi-client ./client
+  - docker build -t wn0858/multi-nginx ./nginx
+  - docker build -t wn0858/multi-server ./server
+  - docker build -t wn0858/multi-worker ./worker
+
+  # log in docker hub account
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # take thoes images and push to docker hub
+  - docker push wn0858/multi-client
+  - docker push wn0858/multi-nginx
+  - docker push wn0858/multi-server
+  - docker push wn0858/multi-worker
+
+language: generic 
